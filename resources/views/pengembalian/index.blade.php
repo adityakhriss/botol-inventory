@@ -25,6 +25,17 @@
             </div>
         @endif
 
+        @php
+            $typeLabels = [
+                'PLASTIK_BESAR' => 'Plastik besar',
+                'PLASTIK_KECIL' => 'Plastik kecil',
+                'KACA_BESAR' => 'Kaca besar',
+                'KACA_KECIL' => 'Kaca kecil',
+            ];
+            $dynamicTypes = $bottles->pluck('type')->filter()->unique()->values();
+            $formatTypeLabel = fn (string $type): string => $typeLabels[$type] ?? ucwords(strtolower(str_replace('_', ' ', $type)));
+        @endphp
+
         <form method="POST" action="{{ route('pengembalian.return') }}" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             @csrf
 
@@ -50,14 +61,13 @@
                         <button type="button" class="type-tab px-3 py-1.5 rounded-full text-sm font-semibold bg-slate-900 text-white"
                                 data-type="ALL">Semua</button>
 
-                        <button type="button" class="type-tab px-3 py-1.5 rounded-full text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                data-type="PLASTIK">Plastik</button>
-
-                        <button type="button" class="type-tab px-3 py-1.5 rounded-full text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                data-type="KACA">Kaca</button>
-
-                        <button type="button" class="type-tab px-3 py-1.5 rounded-full text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                data-type="KACA_KECIL">Kaca Kecil</button>
+                        @foreach($dynamicTypes as $type)
+                            <button type="button" class="type-tab px-3 py-1.5 rounded-full text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                    data-type="{{ $type }}">
+                                {{ $formatTypeLabel((string) $type) }}
+                                <span class="ml-1 text-xs text-slate-500">({{ $stockSummary[$type]['total'] ?? 0 }})</span>
+                            </button>
+                        @endforeach
                     </div>
 
                     {{-- Grid (Compact + 8 kolom di desktop) --}}
@@ -65,7 +75,7 @@
                         @foreach($bottles as $bottle)
                             @php
                                 $borrowed = $bottle->status === 'BORROWED';
-                                $typeLabel = $bottle->type === 'PLASTIK' ? 'Plastik' : ($bottle->type === 'KACA' ? 'Kaca' : 'Kaca Kecil');
+                                $typeLabel = $formatTypeLabel((string) $bottle->type);
 
                                 // amankan dari whitespace tersembunyi agar tidak pecah baris
                                 $safeCode = preg_replace('/\s+/u', '', (string) $bottle->code);

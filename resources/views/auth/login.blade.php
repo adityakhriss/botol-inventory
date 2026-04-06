@@ -118,7 +118,7 @@
 
             {{-- Footer --}}
             <div class="mt-5 text-center text-xs text-slate-500">
-                © {{ date('Y') }} SIPENTOL • Sistem Informasi Peminjaman Botol
+                © {{ date('Y') }} SIMOBOT • Sistem Informasi Monitoring Botol
             </div>
         </div>
     </div>

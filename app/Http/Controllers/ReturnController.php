@@ -15,7 +15,9 @@ class ReturnController extends Controller
         ->orderBy('code')
         ->get(); // <-- JANGAN groupBy
 
-    return view('pengembalian.index', compact('bottles'));
+    $stockSummary = Bottle::stockSummaryByType();
+
+    return view('pengembalian.index', compact('bottles', 'stockSummary'));
 }
 
     public function returnMany(Request $request)
@@ -33,12 +35,6 @@ class ReturnController extends Controller
                 ->get();
 
             foreach ($bottles as $bottle) {
-
-                // hanya proses yang sedang BORROWED
-                if ($bottle->status !== 'BORROWED') {
-                    continue;
-                }
-
                 // Ambil borrow item aktif untuk botol ini
                 $borrowItem = BorrowItem::where('bottle_id', $bottle->id)
                     ->whereNull('returned_at')
@@ -46,9 +42,17 @@ class ReturnController extends Controller
                     ->first();
 
                 if (!$borrowItem) {
-                    // status botol BORROWED tapi item aktif tidak ketemu (edge case),
-                    // biarkan saja atau bisa set available. Kita biarkan aman:
+                    // Self-healing: jika tidak ada item aktif, status seharusnya AVAILABLE.
+                    if ($bottle->status === Bottle::STATUS_BORROWED) {
+                        $bottle->markAsAvailable();
+                    }
+
                     continue;
+                }
+
+                // Self-healing: jika ada item aktif tapi status belum BORROWED.
+                if ($bottle->status !== Bottle::STATUS_BORROWED) {
+                    $bottle->markAsBorrowed();
                 }
 
                 // Tandai item sudah kembali
@@ -57,10 +61,16 @@ class ReturnController extends Controller
                     'handled_by'  => $request->user()->id,
                 ]);
 
-                // Update botol jadi available
-                $bottle->update([
-                    'status' => 'AVAILABLE',
-                ]);
+                $hasActiveBorrowItem = BorrowItem::where('bottle_id', $bottle->id)
+                    ->whereNull('returned_at')
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($hasActiveBorrowItem) {
+                    $bottle->markAsBorrowed();
+                } else {
+                    $bottle->markAsAvailable();
+                }
 
                 // --- Update borrows jika semua item dalam transaksi sudah kembali ---
                 // Lock parent borrow (transaksi) lalu cek masih ada item yang belum returned

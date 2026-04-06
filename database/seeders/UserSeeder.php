@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'PIC',
                 'password' => Hash::make('pic12345'),
-                'role' => 'PENANGGUNG_JAWAB',
+                'role' => User::ROLE_PENANGGUNG_JAWAB,
             ]
         );
 
@@ -24,7 +24,25 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Peminjam',
                 'password' => Hash::make('pinjam12345'),
-                'role' => 'PEMINJAM',
+                'role' => User::ROLE_PEMINJAM,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'admin@local.test'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('admin12345'),
+                'role' => User::ROLE_ADMIN,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'analis@local.test'],
+            [
+                'name' => 'Analis',
+                'password' => Hash::make('analis12345'),
+                'role' => User::ROLE_ANALIS,
             ]
         );
     }

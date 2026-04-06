@@ -13,8 +13,8 @@ return new class extends Migration
 {
     Schema::create('bottles', function (Blueprint $table) {
         $table->id();
-        $table->string('code')->unique(); // BTL-P001
-        $table->enum('type', ['PLASTIK','KACA','KACA_KECIL']);
+        $table->string('code')->unique(); // PB-001
+        $table->enum('type', ['PLASTIK_BESAR','PLASTIK_KECIL','KACA_BESAR','KACA_KECIL']);
         $table->enum('status', ['AVAILABLE','BORROWED'])->default('AVAILABLE');
         $table->timestamps();
     });

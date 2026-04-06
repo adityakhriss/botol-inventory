@@ -16,7 +16,9 @@ class BorrowController extends Controller
         ->orderBy('code')
         ->get();
 
-    return view('peminjaman.index', compact('bottles'));
+    $stockSummary = Bottle::stockSummaryByType();
+
+    return view('peminjaman.index', compact('bottles', 'stockSummary'));
 }
 
     public function store(Request $request)
@@ -35,9 +37,24 @@ class BorrowController extends Controller
                 ->get();
 
             foreach ($bottles as $bottle) {
-                if ($bottle->status !== 'AVAILABLE') {
+                if ($bottle->status !== Bottle::STATUS_AVAILABLE) {
                     abort(422, "Botol {$bottle->code} tidak tersedia.");
                 }
+            }
+
+            $activeBorrowedBottleIds = BorrowItem::query()
+                ->whereIn('bottle_id', $bottles->pluck('id'))
+                ->whereNull('returned_at')
+                ->lockForUpdate()
+                ->pluck('bottle_id');
+
+            if ($activeBorrowedBottleIds->isNotEmpty()) {
+                $codes = $bottles
+                    ->whereIn('id', $activeBorrowedBottleIds->all())
+                    ->pluck('code')
+                    ->implode(', ');
+
+                abort(422, 'Botol masih memiliki peminjaman aktif: ' . $codes . '.');
             }
 
             $borrow = Borrow::create([
@@ -51,9 +68,7 @@ class BorrowController extends Controller
                     'bottle_id' => $bottle->id,
                 ]);
 
-                $bottle->update([
-                    'status' => 'BORROWED'
-                ]);
+                $bottle->markAsBorrowed();
             }
         });
 

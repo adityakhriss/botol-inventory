@@ -9,29 +9,36 @@ class BottleSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ubah angka ini sesuai kebutuhan
-        $plastik = 5;     // P001 - P005
-        $kaca = 5;        // K001 - K005
-        $kacaKecil = 5;   // KC001 - KC005
+        $plastikBesar = 5;
+        $plastikKecil = 5;
+        $kacaBesar = 5;
+        $kacaKecil = 5;
 
-        for ($i=1; $i <= $plastik; $i++) {
+        for ($i=1; $i <= $plastikBesar; $i++) {
             Bottle::updateOrCreate(
-                ['code' => sprintf('BTL-P%03d', $i)],
-                ['type' => 'PLASTIK', 'status' => 'AVAILABLE']
+                ['code' => sprintf('PB-%03d', $i)],
+                ['type' => Bottle::TYPE_PLASTIK_BESAR, 'status' => Bottle::STATUS_AVAILABLE]
             );
         }
 
-        for ($i=1; $i <= $kaca; $i++) {
+        for ($i=1; $i <= $plastikKecil; $i++) {
             Bottle::updateOrCreate(
-                ['code' => sprintf('BTL-K%03d', $i)],
-                ['type' => 'KACA', 'status' => 'AVAILABLE']
+                ['code' => sprintf('PK-%03d', $i)],
+                ['type' => Bottle::TYPE_PLASTIK_KECIL, 'status' => Bottle::STATUS_AVAILABLE]
+            );
+        }
+
+        for ($i=1; $i <= $kacaBesar; $i++) {
+            Bottle::updateOrCreate(
+                ['code' => sprintf('KB-%03d', $i)],
+                ['type' => Bottle::TYPE_KACA_BESAR, 'status' => Bottle::STATUS_AVAILABLE]
             );
         }
 
         for ($i=1; $i <= $kacaKecil; $i++) {
             Bottle::updateOrCreate(
-                ['code' => sprintf('BTL-KC%03d', $i)],
-                ['type' => 'KACA_KECIL', 'status' => 'AVAILABLE']
+                ['code' => sprintf('KK-%03d', $i)],
+                ['type' => Bottle::TYPE_KACA_KECIL, 'status' => Bottle::STATUS_AVAILABLE]
             );
         }
     }

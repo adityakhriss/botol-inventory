@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -32,11 +33,19 @@ class AuthenticatedSessionController extends Controller
 
         $role = Auth::user()->role;
 
-        if ($role === 'PENANGGUNG_JAWAB') {
-        return redirect()->intended('/pengembalian');
-}
+        if ($role === User::ROLE_ADMIN) {
+            return redirect()->intended('/admin/botol');
+        }
 
-return redirect()->intended('/peminjaman');
+        if ($role === User::ROLE_ANALIS) {
+            return redirect()->intended('/checkbot');
+        }
+
+        if ($role === User::ROLE_PENANGGUNG_JAWAB) {
+            return redirect()->intended('/pengembalian');
+        }
+
+        return redirect()->intended('/peminjaman');
     }
 
     /**

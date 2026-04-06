@@ -15,6 +15,36 @@
                     </a>
                 </div>
 
+                <div class="hidden sm:flex sm:items-center sm:ms-8 sm:space-x-2">
+                    @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'PEMINJAM')
+                        <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
+                            Peminjaman
+                        </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'PENANGGUNG_JAWAB')
+                        <x-nav-link :href="route('pengembalian.index')" :active="request()->routeIs('pengembalian.*')">
+                            Pengembalian
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('histori.index')" :active="request()->routeIs('histori.*')">
+                            Histori
+                        </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'ANALIS')
+                        <x-nav-link :href="route('checkbot.index')" :active="request()->routeIs('checkbot.*')">
+                            Checkbot 5%
+                        </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->role === 'ADMIN')
+                        <x-nav-link :href="route('admin.bottles.index')" :active="request()->routeIs('admin.bottles.*')">
+                            Manajemen Botol
+                        </x-nav-link>
+                    @endif
+                </div>
+
             </div>
 
             <!-- Right Side -->
@@ -40,20 +70,11 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <!-- MENU KHUSUS PIC -->
-                        @if(auth()->user()->role === 'PENANGGUNG_JAWAB')
+                        <x-dropdown-link :href="route('profile.edit')">
+                            Profile
+                        </x-dropdown-link>
 
-                            <x-dropdown-link :href="route('pengembalian.index')">
-                                Reset Pengembalian
-                            </x-dropdown-link>
-
-                            <x-dropdown-link :href="route('histori.index')">
-                                Histori
-                            </x-dropdown-link>
-
-                            <div class="border-t border-gray-200 my-1"></div>
-
-                        @endif
+                        <div class="border-t border-gray-200 my-1"></div>
 
                         <!-- Logout -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -89,6 +110,59 @@
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        <div class="pt-2 pb-3 space-y-1">
+            @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'PEMINJAM')
+                <x-responsive-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
+                    Peminjaman
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'PENANGGUNG_JAWAB')
+                <x-responsive-nav-link :href="route('pengembalian.index')" :active="request()->routeIs('pengembalian.*')">
+                    Pengembalian
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('histori.index')" :active="request()->routeIs('histori.*')">
+                    Histori
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'ANALIS')
+                <x-responsive-nav-link :href="route('checkbot.index')" :active="request()->routeIs('checkbot.*')">
+                    Checkbot 5%
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->role === 'ADMIN')
+                <x-responsive-nav-link :href="route('admin.bottles.index')" :active="request()->routeIs('admin.bottles.*')">
+                    Manajemen Botol
+                </x-responsive-nav-link>
+            @endif
+        </div>
+
+        <div class="pt-4 pb-1 border-t border-gray-200">
+            <div class="px-4">
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            </div>
+
+            <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                    Profile
+                </x-responsive-nav-link>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <x-responsive-nav-link :href="route('logout')"
+                        onclick="event.preventDefault(); this.closest('form').submit();">
+                        Log Out
+                    </x-responsive-nav-link>
+                </form>
             </div>
         </div>
     </div>
