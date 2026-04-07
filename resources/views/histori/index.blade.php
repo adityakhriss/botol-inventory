@@ -7,11 +7,18 @@
             <p class="text-slate-600">Hanya bisa diakses Penanggung Jawab.</p>
         </div>
 
-        <form method="GET" class="w-full sm:w-80">
-            <input name="q" value="{{ $q ?? '' }}"
-                class="w-full rounded-xl border border-slate-200 px-3 py-2"
-                placeholder="Cari nama peminjam / kode botol..." />
-        </form>
+        <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2 sm:items-center">
+            <form method="GET" class="w-full sm:w-80">
+                <input name="q" value="{{ $q ?? '' }}"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2"
+                    placeholder="Cari nama peminjam / kode botol..." />
+            </form>
+
+            <a href="{{ route('histori.export', ['q' => $q]) }}"
+               class="inline-flex items-center justify-center rounded-xl px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">
+                Export XLSX
+            </a>
+        </div>
     </div>
 
     <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 overflow-hidden">
