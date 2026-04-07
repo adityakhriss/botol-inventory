@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CheckbotRunExport;
 use App\Models\Bottle;
 use App\Models\CheckbotItem;
 use App\Models\CheckbotRun;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CheckbotController extends Controller
 {
@@ -57,9 +60,18 @@ class CheckbotController extends Controller
         $data = $request->validate([
             'analyst_name' => 'required|string|max:100',
             'tested_at' => 'required|date',
+            'selection_mode' => ['nullable', Rule::in(['all', 'selected'])],
+            'selected_types' => ['array', 'required_if:selection_mode,selected', 'min:1'],
+            'selected_types.*' => ['string', Rule::in($this->types)],
         ]);
 
-        $run = DB::transaction(function () use ($data, $request): CheckbotRun {
+        $selectionMode = $data['selection_mode'] ?? 'all';
+        $selectedTypes = $data['selected_types'] ?? [];
+        $typesToSample = $selectionMode === 'selected'
+            ? array_values(array_unique($selectedTypes))
+            : $this->types;
+
+        $run = DB::transaction(function () use ($data, $request, $typesToSample): CheckbotRun {
             $run = CheckbotRun::create([
                 'analyst_name' => $data['analyst_name'],
                 'tested_at' => $data['tested_at'],
@@ -67,7 +79,7 @@ class CheckbotController extends Controller
                 'created_by' => $request->user()->id,
             ]);
 
-            foreach ($this->types as $type) {
+            foreach ($typesToSample as $type) {
                 $population = Bottle::where('type', $type)
                     ->where('status', Bottle::STATUS_AVAILABLE)
                     ->count();
@@ -152,6 +164,11 @@ class CheckbotController extends Controller
 
         return redirect()->route('checkbot.runs.show', $run)
             ->with('success', 'Hasil uji kualitas botol berhasil disimpan.');
+    }
+
+    public function exportRun(CheckbotRun $run): StreamedResponse
+    {
+        return (new CheckbotRunExport($run))->download();
     }
 
     private function calculateSampleCount(int $population): int

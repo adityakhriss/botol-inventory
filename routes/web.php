@@ -80,6 +80,7 @@ Route::middleware(['auth', 'role:PENANGGUNG_JAWAB,ADMIN'])->group(function () {
     Route::post('/pengembalian', [ReturnController::class, 'returnMany'])->name('pengembalian.return');
 
     Route::get('/histori', [HistoryController::class, 'index'])->name('histori.index');
+    Route::get('/histori/export', [HistoryController::class, 'export'])->name('histori.export');
 });
 
 /**
@@ -90,6 +91,7 @@ Route::middleware(['auth', 'role:ANALIS,ADMIN'])->group(function () {
     Route::post('/checkbot/runs', [CheckbotController::class, 'storeRun'])->name('checkbot.runs.store');
     Route::get('/checkbot/runs/{run}', [CheckbotController::class, 'showRun'])->name('checkbot.runs.show');
     Route::post('/checkbot/runs/{run}/results', [CheckbotController::class, 'saveResults'])->name('checkbot.runs.results');
+    Route::get('/checkbot/runs/{run}/export', [CheckbotController::class, 'exportRun'])->name('checkbot.runs.export');
 });
 
 /**

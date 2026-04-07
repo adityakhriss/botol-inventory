@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BorrowHistoryExport;
 use App\Models\Borrow;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HistoryController extends Controller
 {
@@ -20,5 +22,10 @@ class HistoryController extends Controller
             ->paginate(10);
 
         return view('histori.index', compact('borrows', 'q'));
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        return (new BorrowHistoryExport($request->query('q')))->download();
     }
 }
