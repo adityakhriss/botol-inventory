@@ -34,7 +34,40 @@
             ];
             $dynamicTypes = $bottles->pluck('type')->filter()->unique()->values();
             $formatTypeLabel = fn (string $type): string => $typeLabels[$type] ?? ucwords(strtolower(str_replace('_', ' ', $type)));
+            $totalBotol = $bottles->count();
+            $borrowedBotol = $bottles->where('status', 'BORROWED')->count();
+            $availableBotol = $bottles->where('status', 'AVAILABLE')->count();
         @endphp
+
+        <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 space-y-4">
+            <div>
+                <h2 class="text-base font-semibold text-slate-900">Ringkasan Reset Pengembalian</h2>
+                <p class="mt-1 text-sm text-slate-600">Pantau status botol dan lompat cepat ke area pemilihan pengembalian.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Total Botol</p>
+                    <p class="mt-1 text-2xl font-semibold text-slate-900">{{ $totalBotol }}</p>
+                </div>
+
+                <div class="rounded-xl bg-rose-50 p-4 ring-1 ring-rose-200">
+                    <p class="text-xs font-medium uppercase tracking-wide text-rose-700">Sedang Dipinjam</p>
+                    <p class="mt-1 text-2xl font-semibold text-rose-800">{{ $borrowedBotol }}</p>
+                </div>
+
+                <div class="rounded-xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
+                    <p class="text-xs font-medium uppercase tracking-wide text-emerald-700">Sudah Tersedia</p>
+                    <p class="mt-1 text-2xl font-semibold text-emerald-800">{{ $availableBotol }}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <a href="#bottleGrid" class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800">Pilih Botol</a>
+                <a href="#selectedCodes" class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-200">Lihat Pilihan</a>
+                <a href="#submitBtn" class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-200">Tombol Konfirmasi</a>
+            </div>
+        </div>
 
         <form method="POST" action="{{ route('pengembalian.return') }}" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             @csrf
@@ -71,7 +104,7 @@
                     </div>
 
                     {{-- Grid (Compact + 8 kolom di desktop) --}}
-                    <div class="mt-4 grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-2" id="bottleGrid">
+                    <div class="mt-4 max-h-[27rem] overflow-y-auto pr-1 grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-2" id="bottleGrid">
                         @foreach($bottles as $bottle)
                             @php
                                 $borrowed = $bottle->status === 'BORROWED';

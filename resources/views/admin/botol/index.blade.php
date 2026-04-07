@@ -29,10 +29,36 @@
                 'KACA_BESAR' => 'Kaca besar',
                 'KACA_KECIL' => 'Kaca kecil',
             ];
+
+            $totalBotol = $bottles->total();
+            $availableDiHalaman = $bottles->getCollection()->where('status', 'AVAILABLE')->count();
+            $borrowedDiHalaman = $bottles->getCollection()->where('status', 'BORROWED')->count();
         @endphp
 
+        <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 space-y-4">
+            <div>
+                <h2 class="text-base font-semibold text-slate-900">Ringkasan Manajemen Botol</h2>
+                <p class="mt-1 text-sm text-slate-600">Panel cepat untuk melihat kondisi data sebelum melakukan perubahan.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Total Botol</p>
+                    <p class="mt-1 text-2xl font-semibold text-slate-900">{{ $totalBotol }}</p>
+                </div>
+
+                <div class="rounded-xl bg-rose-50 p-4 ring-1 ring-rose-200">
+                    <p class="text-xs font-medium uppercase tracking-wide text-rose-700">Dipinjam</p>
+                    <p class="mt-1 text-2xl font-semibold text-rose-800">{{ $borrowedDiHalaman }}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <div id="form-tambah-botol" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
                 <h2 class="text-base font-semibold text-slate-900">Tambah Botol</h2>
 
                 <form method="POST" action="{{ route('admin.bottles.store') }}" class="mt-4 space-y-4">
@@ -58,7 +84,7 @@
                 </form>
             </div>
 
-            <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <div id="form-tambah-massal" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
                 <h2 class="text-base font-semibold text-slate-900">Tambah Massal</h2>
 
                 <form method="POST" action="{{ route('admin.bottles.bulk') }}" class="mt-4 space-y-4">
@@ -85,7 +111,7 @@
             </div>
         </div>
 
-        <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <div id="daftar-botol" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                 <div>
                     <label class="text-sm font-medium text-slate-700">Cari Kode</label>
@@ -131,18 +157,6 @@
                                 </td>
                                 <td class="p-3">
                                     <div class="flex flex-wrap gap-2">
-                                        <form method="POST" action="{{ route('admin.bottles.update', $bottle) }}" class="flex flex-wrap gap-2">
-                                            @csrf
-                                            @method('PATCH')
-                                            <input type="text" name="code" value="{{ $bottle->code }}" class="w-36 rounded-lg border border-slate-200 px-2 py-1">
-                                            <select name="type" class="rounded-lg border border-slate-200 px-2 py-1">
-                                                @foreach($types as $itemType)
-                                                    <option value="{{ $itemType }}" @selected($bottle->type === $itemType)>{{ $typeLabels[$itemType] ?? str_replace('_', ' ', $itemType) }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="submit" class="rounded-lg px-3 py-1 bg-slate-900 text-white text-xs font-semibold">Update</button>
-                                        </form>
-
                                         <form method="POST" action="{{ route('admin.bottles.destroy', $bottle) }}" onsubmit="return confirm('Hapus botol ini?')">
                                             @csrf
                                             @method('DELETE')
