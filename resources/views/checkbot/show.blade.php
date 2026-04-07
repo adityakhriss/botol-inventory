@@ -92,7 +92,7 @@
                                                 name="items[{{ $item->id }}][parameter]"
                                                 value="{{ old("items.{$item->id}.parameter", $item->parameter) }}"
                                                 class="w-full rounded-lg border border-slate-200 px-2 py-1"
-                                                placeholder="Contoh: Kebersihan, retak, tekanan"
+                                                placeholder="Contoh: TSS, Minyak Lemak, E.coli"
                                                 required
                                             >
                                         </td>
@@ -102,7 +102,7 @@
                                                 name="items[{{ $item->id }}][test_result]"
                                                 value="{{ old("items.{$item->id}.test_result", $item->test_result) }}"
                                                 class="w-full rounded-lg border border-slate-200 px-2 py-1"
-                                                placeholder="Contoh: Tidak retak, bersih"
+                                                placeholder="Contoh: <1 mg/L"
                                                 required
                                             >
                                         </td>
